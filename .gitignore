@@ -1,0 +1,36 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Python / Django
+.venv/
+__pycache__/
+*.pyc
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+.coverage
+.pytest_cache/
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# Env files - single root .env (keep .env.example tracked)
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+
+# Local demo credentials (never commit)
+DEMO_CREDENTIALS.txt
+create_demo_data.py
+LOCAL_SETUP_COMPLETE.md

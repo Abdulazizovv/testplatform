@@ -1,0 +1,6 @@
+[flake8]
+max-line-length = 110
+exclude = migrations,.venv
+# Test files carry long, readable fixture/assert lines.
+per-file-ignores =
+    */tests/*:E501

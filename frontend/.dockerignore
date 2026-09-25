@@ -1,0 +1,16 @@
+.git
+.gitignore
+node_modules
+.next
+out
+tsconfig.tsbuildinfo
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Dockerfile
+docker-compose*.yml
+.dockerignore
+*.md
