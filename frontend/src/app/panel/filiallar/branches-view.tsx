@@ -23,6 +23,7 @@ function BranchForm({ branch, onClose, onSaved }: { branch: BranchFull | null; o
   const [slugTouched, setSlugTouched] = useState(!!branch);
   const [address, setAddress] = useState(branch?.address ?? "");
   const [isActive, setIsActive] = useState(branch?.is_active ?? true);
+  const [chatId, setChatId] = useState(branch?.telegram_chat_id ?? "");
   const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<{ fields: Record<string, string>; general: string | null }>({ fields: {}, general: null });
 
@@ -31,7 +32,7 @@ function BranchForm({ branch, onClose, onSaved }: { branch: BranchFull | null; o
     setPending(true);
     setErrors({ fields: {}, general: null });
     try {
-      const body = { name: name.trim(), slug: slug.trim(), address: address.trim(), is_active: isActive };
+      const body = { name: name.trim(), slug: slug.trim(), address: address.trim(), is_active: isActive, telegram_chat_id: chatId.trim() };
       if (branch) await apiPatch(`/api/v1/branches/${branch.id}/`, body);
       else await apiPost("/api/v1/branches/", body);
       toast.success(branch ? "Filial yangilandi." : "Filial yaratildi.");
@@ -94,6 +95,15 @@ function BranchForm({ branch, onClose, onSaved }: { branch: BranchFull | null; o
         </Field>
         <Field label="Manzil" error={errors.fields.address}>
           {(p) => <Input {...p} value={address} maxLength={300} onChange={(e) => setAddress(e.target.value)} />}
+        </Field>
+        <Field
+          label="Telegram chat ID"
+          hint="Ixtiyoriy. Bu filial natijalari shu chatga yuboriladi; bo'sh bo'lsa umumiy chatga."
+          error={errors.fields.telegram_chat_id}
+        >
+          {(p) => (
+            <Input {...p} value={chatId} maxLength={64} inputMode="text" autoCapitalize="none" spellCheck={false} placeholder="-1001234567890" onChange={(e) => setChatId(e.target.value)} />
+          )}
         </Field>
         <Checkbox label="Filial faol" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
         {!isActive && (

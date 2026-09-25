@@ -67,8 +67,7 @@ services:
       - internal
 
   # Celery worker (celery-beat is added later, when the first periodic job exists).
-  # Talks only to postgres/redis, so it sits on the internal network alone - no
-  # outbound internet access until a task actually needs it (e.g. the Telegram bot).
+  # Also joins `public` (the `internal` network has no internet) so it can reach the Telegram Bot API.
   celery:
     build: ./backend
     restart: unless-stopped
@@ -92,6 +91,7 @@ services:
         condition: service_healthy
     networks:
       - internal
+      - public  # outbound internet for the Telegram Bot API
 
   frontend:
     build:

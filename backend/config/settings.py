@@ -189,6 +189,13 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False  # keep our JSON logging config
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
+# --- Telegram result notifications (decision #33) ----------------------------
+# Off (silently) unless BOT_TOKEN and a chat (per-branch or the shared one) are set.
+TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", default="").strip()
+TELEGRAM_CHAT_ID = env("TELEGRAM_CHAT_ID", default="").strip()
+# Public site origin used only for the "Batafsil" link (e.g. https://<domain>); empty -> no link.
+PUBLIC_BASE_URL = env("PUBLIC_BASE_URL", default="").strip().rstrip("/")
+
 # --- DRF ---------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],

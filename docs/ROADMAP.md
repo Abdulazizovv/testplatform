@@ -29,10 +29,14 @@ result link (token). App `attempts`, public API `/api/v1/public/` (decisions #21
 `/`, `/filial/<slug>[/<fan>]`, `/test/<id>`, `/yechish/<token>`, `/natija/<token>`. Strict
 throttling (DRF + nginx). Not in this phase: results dashboard/export (3), import (4), bot (5).
 
-## Phase 3 - Results and export (NEXT)
-Result lists/filters per test/subject/branch (scoped), export (CSV/XLSX).
+## Phase 3 - Results, export and Telegram notification (DONE)
+Staff results API `/api/v1/results/` (list + filters + summary, detail from snapshots, per-test
+question analysis, xlsx export, all scoped), panel pages `/panel/natijalar[/id|/test/id]`,
+dashboard latest results. Telegram result message per finished attempt (Celery task, Bot API
+over HTTPS, no bot process): decisions #31-#34, setup in `/docs/TELEGRAM.md`. Next: Phase 4
+(import), then Phase 5 (interactive bot).
 
-## Phase 4 - Import
+## Phase 4 - Import (NEXT)
 Import tests/questions from files (format TBD).
 
 ## Phase 5 - Telegram bot

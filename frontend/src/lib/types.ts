@@ -34,6 +34,8 @@ export interface Paginated<T> {
 export interface BranchFull extends BranchBrief {
   address: string;
   is_active: boolean;
+  /** Superadmin only (hidden from other roles by the API). */
+  telegram_chat_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -144,4 +146,83 @@ export interface PublishProblem {
   question_id: string;
   number: number;
   problems: string[];
+}
+
+// --- Results (docs/API.md, Phase 3) ---
+export type AttemptStatus = "in_progress" | "finished" | "expired";
+
+export const ATTEMPT_STATUS_LABELS: Record<AttemptStatus, string> = {
+  in_progress: "Davom etmoqda",
+  finished: "Yakunlangan",
+  expired: "Vaqti tugagan",
+};
+
+export interface ResultRow {
+  id: string;
+  full_name: string;
+  age: number;
+  test: { id: string; title: string };
+  subject: { id: string; name: string };
+  branch: { id: string; name: string };
+  status: AttemptStatus;
+  score: number | null;
+  max_score: number | null;
+  percent: string | null;
+  passed: boolean | null;
+  pass_percent: number;
+  started_at: string;
+  finished_at: string | null;
+  duration_sec: number | null;
+}
+
+export interface ResultSummary {
+  attempts: number;
+  avg_percent: number | null;
+  pass_rate: number | null;
+}
+
+export interface ResultList extends Paginated<ResultRow> {
+  summary: ResultSummary;
+}
+
+export interface ResultOption {
+  id: string;
+  text_html: string;
+  image_url: string | null;
+  is_correct: boolean;
+  selected: boolean;
+}
+
+export interface ResultItem {
+  order: number;
+  type: "single" | "multiple";
+  points: number;
+  points_awarded: number;
+  answered: boolean;
+  is_correct: boolean | null;
+  body_html: string;
+  image_url: string | null;
+  explanation_html: string;
+  options: ResultOption[];
+}
+
+export interface ResultDetail extends ResultRow {
+  items: ResultItem[];
+}
+
+export interface QuestionAnalysis {
+  question_id: string;
+  order: number;
+  type: "single" | "multiple";
+  body_html: string;
+  image_url: string | null;
+  answered_count: number;
+  correct_count: number;
+  correct_percent: number;
+  top_wrong_option: { option_id: string; text_html: string; image_url: string | null; count: number } | null;
+}
+
+export interface TestResultSummary extends ResultSummary {
+  test: { id: string; title: string; subject: string };
+  questions: QuestionAnalysis[];
 }

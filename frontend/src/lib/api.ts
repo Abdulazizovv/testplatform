@@ -171,6 +171,29 @@ export function uploadImage(file: File, branchId?: string): Promise<MediaAsset> 
   return request<MediaAsset>("POST", "/api/v1/media/", { form });
 }
 
+/** Downloads a file endpoint (e.g. the xlsx export) through the browser; errors keep their Uzbek message. */
+export async function downloadFile(path: string, query?: Query): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(withQuery(path, query), { credentials: "same-origin", cache: "no-store" });
+  } catch {
+    throw new ApiError(0, NETWORK_ERROR);
+  }
+  if (!res.ok) {
+    if (res.status === 401) endSession();
+    throw await parseError(res);
+  }
+  const match = /filename="?([^";]+)"?/.exec(res.headers.get("Content-Disposition") ?? "");
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = match?.[1] ?? "natijalar.xlsx";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
 /** Loads every page of a paginated endpoint (page_size 100). */
 export async function apiGetAll<T>(path: string, query: Query = {}): Promise<T[]> {
   const out: T[] = [];

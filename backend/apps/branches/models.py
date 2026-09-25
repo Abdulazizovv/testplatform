@@ -10,6 +10,8 @@ class Branch(BaseModel):
     slug = models.SlugField("Slug", max_length=80, unique=True)
     address = models.CharField("Manzil", max_length=300, blank=True)
     is_active = models.BooleanField("Faol", default=True)
+    # Optional Telegram chat for result notifications; empty -> the shared TELEGRAM_CHAT_ID.
+    telegram_chat_id = models.CharField("Telegram chat ID", max_length=64, blank=True)
 
     class Meta:
         ordering = ["name"]

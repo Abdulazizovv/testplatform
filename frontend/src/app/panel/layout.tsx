@@ -12,6 +12,7 @@ const NAV: Array<NavItem & { roles: Role[] }> = [
   { href: "/panel/foydalanuvchilar", label: "Foydalanuvchilar", icon: "users", roles: ["superadmin", "admin"] },
   { href: "/panel/fanlar", label: "Fanlar", icon: "subject", roles: ["superadmin", "admin", "teacher"] },
   { href: "/panel/testlar", label: "Testlar", icon: "test", roles: ["superadmin", "admin", "teacher"] },
+  { href: "/panel/natijalar", label: "Natijalar", icon: "results", roles: ["superadmin", "admin", "teacher"] },
 ];
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {

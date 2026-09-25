@@ -45,6 +45,9 @@ function TestRow({ me, test, reload }: { me: CurrentUser; test: TestItem; reload
             <Link href={`/panel/testlar/${test.id}`} className={buttonClass("secondary", "sm")}>
               Ochish
             </Link>
+            <Link href={`/panel/natijalar/test/${test.id}`} className={buttonClass("secondary", "sm")}>
+              Natijalar va tahlil
+            </Link>
             {test.status !== "published" && (
               <Button variant="secondary" size="sm" disabled={busy} onClick={() => run("publish")}>
                 Nashr qilish

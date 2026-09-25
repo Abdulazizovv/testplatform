@@ -1,7 +1,9 @@
-import { ArrowUpRight, BookOpen, Building2, ClipboardCheck, Globe2, Users, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, BarChart3, BookOpen, Building2, ClipboardCheck, Globe2, Users, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { requireUser, serverGet } from "@/lib/session";
-import { ROLE_LABELS, type Paginated } from "@/lib/types";
+import { formatDateTime, formatPercent } from "@/lib/format";
+import { ResultBadge } from "@/components/result-badge";
+import { ROLE_LABELS, type Paginated, type ResultList } from "@/lib/types";
 import { buttonClass } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/states";
 
@@ -31,12 +33,13 @@ function Card({ href, label, value, icon: Icon, tint }: { href: string; label: s
 export default async function PanelPage() {
   const user = await requireUser();
   const isAdmin = user.role === "superadmin" || user.role === "admin";
-  const [branches, users, subjects, tests, published] = await Promise.all([
+  const [branches, users, subjects, tests, published, recent] = await Promise.all([
     user.role === "superadmin" ? count("branches/") : null,
     isAdmin ? count("users/?is_active=true") : null,
     count("subjects/"),
     count("tests/"),
     count("tests/?status=published"),
+    serverGet<ResultList>("/api/v1/results/?page_size=5"),
   ]);
   const name = `${user.first_name} ${user.last_name}`.trim() || user.username;
 
@@ -58,7 +61,41 @@ export default async function PanelPage() {
         <Card href="/panel/testlar" label="Testlar" value={tests} icon={ClipboardCheck} tint={3} />
         <Card href="/panel/testlar" label="E'lon qilingan testlar" value={published} icon={Globe2} tint={2} />
       </div>
-      <p className="text-sm text-muted">Test natijalari keyingi bosqichda shu yerda ko&apos;rinadi.</p>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="flex items-center gap-2 text-xl font-extrabold">
+            <BarChart3 className="size-5 text-muted" aria-hidden="true" />
+            So&apos;nggi natijalar
+          </h2>
+          <Link href="/panel/natijalar" className="text-sm font-bold text-accent hover:underline">
+            Hammasi
+          </Link>
+        </div>
+        {recent === null ? (
+          <p className="text-sm text-muted">Natijalarni yuklab bo&apos;lmadi.</p>
+        ) : recent.results.length === 0 ? (
+          <p className="text-sm text-muted">Hozircha natija yo&apos;q. O&apos;quvchilar test topshirgach, shu yerda ko&apos;rinadi.</p>
+        ) : (
+          <ul className="divide-y divide-border-soft overflow-hidden rounded-2xl border border-border-soft bg-surface shadow-sm">
+            {recent.results.map((r) => (
+              <li key={r.id}>
+                <Link href={`/panel/natijalar/${r.id}`} className="flex min-h-11 flex-wrap items-center justify-between gap-2 p-4 hover:bg-subtle">
+                  <span className="min-w-0">
+                    <span className="block truncate font-bold">{r.full_name}</span>
+                    <span className="block truncate text-sm text-muted">
+                      {r.test.title} · {formatDateTime(r.started_at)}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-3">
+                    <span className="text-sm font-bold tabular-nums">{formatPercent(r.percent)}</span>
+                    <ResultBadge row={r} />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

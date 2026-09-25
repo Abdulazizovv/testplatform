@@ -184,6 +184,41 @@ one NAT address shares them - hence the generous read/answer numbers.
 letters. Age: integer 4-100. Both errors are Uzbek. `ip` and `user_agent` are stored on the
 attempt.
 
+## Phase 3 decisions (implemented)
+
+**#31 - Results scope.** `attempts_for` = `scope_for` (superadmin all, admin own branch) plus,
+for teachers, `test__subject__teachers=user` (only assigned subjects, same rule as #13). List,
+detail, summary and export all start from it (summary also from `tests_for`). The `branch` filter
+can only narrow, never widen. Isolation tests: `attempts/tests/test_results.py`. Results are
+read from the frozen snapshots (#25), so editing a test never changes a stored result. Question
+statistics group by `AttemptItem.question_id`; "most chosen wrong option" counts selected
+non-correct option ids from the snapshots. In-progress attempts are hidden unless
+`status=in_progress` is requested. Averages/pass rate ignore ungraded attempts.
+
+**#32 - Excel export.** `openpyxl` write-only, built in memory (<= 10 000 rows, else `400`; no
+truncation so the file is never silently incomplete). Formula injection: every text cell that
+starts with `= + - @ TAB CR LF` gets a leading apostrophe AND is written with an explicit string
+cell type. CSV was not added (xlsx only) to avoid a second, weaker-escaping format.
+
+**#33 - Telegram result notification.** No bot process: when an attempt closes (`finalize()`,
+covers finish and lazy expiry) `transaction.on_commit` queues the Celery task
+`attempts.tasks.notify_attempt_finished`; it posts `sendMessage` (HTML, escaped, <= 4096 chars,
+no link preview) with stdlib `urllib` (no new dependency). Idempotent: the task claims the attempt
+with a conditional UPDATE of `Attempt.telegram_notified_at`, releases the claim on failure. Retries:
+429 waits `retry_after + 1`, other retryable errors back off 30 s * 2^n (max 5); 4xx are permanent
+(logged). Every failure (broker down, Telegram down, bug) is swallowed/logged and cannot affect the
+student flow. Off silently unless `TELEGRAM_BOT_TOKEN` and a chat (branch or `TELEGRAM_CHAT_ID`) are
+set. The message links to the STAFF panel (`PUBLIC_BASE_URL/panel/natijalar/<id>`, login required);
+the student's secret `/natija/<token>` link is never sent. `PUBLIC_BASE_URL` empty/non-http(s) ->
+no link. The token appears only in the request URL and is never logged. The celery container joined
+the `public` network (the `internal` one has no internet). Check with `manage.py telegram_test`.
+Setup steps: `/docs/TELEGRAM.md`.
+
+**#34 - Branch chat id is superadmin-only.** `Branch.telegram_chat_id` is written only by
+superadmin (branch writes already were) and hidden from admin/teacher responses. Letting an admin
+redirect result messages (child names) to an arbitrary chat is a data-leak risk, and it keeps the
+permission matrix unchanged. Revisit if branch admins should manage it themselves.
+
 ## Future decisions (recorded now, implemented in their phase)
 
 **F1 - Content hierarchy:** Branch -> Subject (belongs to ONE branch) -> Test -> Question ->

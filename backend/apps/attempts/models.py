@@ -47,6 +47,8 @@ class Attempt(BaseModel):
     passed = models.BooleanField(null=True, blank=True)
     ip = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=300, blank=True)
+    # Set once the Telegram result notification went out (idempotency guard, decision #33).
+    telegram_notified_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     class Meta:
         ordering = ["-started_at"]

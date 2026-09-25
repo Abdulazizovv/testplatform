@@ -13,7 +13,7 @@ import { RichHtml } from "@/components/rich-html";
 import { TestActions, statusTone } from "@/components/test-actions";
 import { TestForm } from "@/components/test-form";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClass } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState, ErrorState, Loading, Notice } from "@/components/ui/states";
 import { useToast } from "@/components/ui/toast";
@@ -133,6 +133,9 @@ export function TestEditor({ me, testId }: { me: CurrentUser; testId: string }) 
           >
             {({ run, duplicate, remove, canDelete, busy }) => (
               <div className="flex flex-wrap gap-2">
+                <Link href={`/panel/natijalar/test/${test.id}`} className={buttonClass("secondary", "sm")}>
+                  Natijalar va tahlil
+                </Link>
                 <Button variant="secondary" size="sm" onClick={() => setSettings(true)}>
                   Sozlamalar
                 </Button>

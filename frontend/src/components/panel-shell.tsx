@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, BookOpen, ChevronDown, ClipboardCheck, ExternalLink, LayoutDashboard, LogOut, Menu, Users, X, type LucideIcon } from "lucide-react";
+import { BarChart3, Building2, BookOpen, ChevronDown, ClipboardCheck, ExternalLink, LayoutDashboard, LogOut, Menu, Users, X, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
 import { ToastProvider } from "@/components/ui/toast";
 
-export type NavIcon = "home" | "branch" | "users" | "subject" | "test";
+export type NavIcon = "home" | "branch" | "users" | "subject" | "test" | "results";
 export interface NavItem {
   href: string;
   label: string;
@@ -25,6 +25,7 @@ const ICONS: Record<NavIcon, LucideIcon> = {
   users: Users,
   subject: BookOpen,
   test: ClipboardCheck,
+  results: BarChart3,
 };
 
 function displayName(user: CurrentUser) {

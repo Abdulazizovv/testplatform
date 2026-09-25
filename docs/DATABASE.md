@@ -12,6 +12,7 @@ PostgreSQL 16. All primary keys are UUIDs (`BaseModel`); all models have
 | name | varchar(200) | |
 | slug | slug(80), unique | used in public URLs (`/filial/<slug>`) |
 | address | varchar(300), blank | |
+| telegram_chat_id | varchar(64), blank | optional Telegram chat for result messages; empty -> shared `TELEGRAM_CHAT_ID` (superadmin-managed, decision #34) |
 | is_active | bool, default true | inactive branch: its staff can't log in / use the API (decision #12); hidden from the public picker |
 | created_at / updated_at | timestamptz | |
 
@@ -93,7 +94,7 @@ Branch 1--* Attempt  (denormalised from test.branch, set in save())
 `tp_device` cookie), `status` (`in_progress` / `finished` / `expired`), `started_at`,
 `deadline_at` (null = unlimited), `finished_at`, `seed`, `pass_percent` (frozen at start),
 `score`, `max_score`, `percent` (decimal 5,2), `passed` (null until closed), `ip`,
-`user_agent`. Constraint `one_active_attempt_per_device_test`: unique `(test, device_id)`
+`user_agent`, `telegram_notified_at` (Phase 3: set once the Telegram message went out; idempotency guard). Constraint `one_active_attempt_per_device_test`: unique `(test, device_id)`
 where `status='in_progress'`. Index `(test, device_id)`. Helper `attempts.scoping.attempts_for`.
 
 ### `attempts.AttemptItem`
@@ -111,4 +112,4 @@ Migration: `attempts/0001_initial`.
 - Telegram bot (Phase 5) adds phone -> name identification; nothing in Phase 0-4 depends on it.
 
 Migrations: `make makemigrations` then `make migrate` (auto-run on container start too).
-Current: `attempts/0001_initial`, `branches/0001`, `accounts/0001`, `content/0001`, `accounts/0002_user_subjects`.
+Current: `attempts/0001_initial`, `attempts/0002_attempt_telegram_notified_at`, `branches/0001`, `branches/0002_branch_telegram_chat_id`, `accounts/0001`, `content/0001`, `accounts/0002_user_subjects`.

@@ -56,7 +56,9 @@ Role legend: **SA** superadmin, **A** branch admin (own branch), **T** teacher
 | GET | `/branches/`, `/branches/{id}/` | SA all; A/T only their own |
 | POST / PATCH / PUT / DELETE | `/branches/`, `/branches/{id}/` | SA only. DELETE -> `409` if the branch still has users/content |
 
-Fields: `id, name, slug (unique), address, is_active, created_at, updated_at`.
+Fields: `id, name, slug (unique), address, is_active, telegram_chat_id, created_at, updated_at`.
+`telegram_chat_id` (optional; a number like `-1001234567890` or `@channel`) is returned to and
+writable by **superadmin only** (decision #34); other roles never see the field.
 
 ### Users - `/users/` (SA, A only; teachers get 403)
 | method | path | notes |
@@ -162,6 +164,25 @@ Attempt responses are `Cache-Control: no-store`.
 
 Attempt `status`: `in_progress`, `finished`, `expired` (time ran out; graded from saved answers).
 
+## Implemented (Phase 3) - staff results, `/api/v1/results/`
+
+All need staff login, are paginated and scoped through `attempts_for` (decision #31): superadmin
+everything, admin own branch, teacher only tests of assigned subjects. Out-of-scope ids -> `404`.
+Bad filter values -> `400` field errors.
+
+| method | path | notes |
+|---|---|---|
+| GET | `/results/` | filters: `test, subject, branch, status (in_progress/finished/expired), passed (true/false), date_from, date_to (YYYY-MM-DD, by start date, Asia/Tashkent), search (name)`. Without `status` only closed attempts (finished + expired) are listed. Newest first. Response = standard pagination + `summary: {attempts, avg_percent, pass_rate}` over the WHOLE filtered set (null when nothing is graded) |
+| GET | `/results/{id}/` | row fields + `items[{order, type, points, points_awarded, answered, is_correct, body_html, image_url, explanation_html, options[{id, text_html, image_url, is_correct, selected}]}]`, all from the frozen snapshot |
+| GET | `/results/tests/{test_id}/summary/` | `{test, attempts, avg_percent, pass_rate, questions[{question_id, order, type, body_html, answered_count, correct_count, correct_percent, top_wrong_option{option_id, text_html, count} or null}]}` |
+| GET | `/results/export/` | same filters; `.xlsx` download (openpyxl write-only). Columns: Filial, Fan, Test, Ism, Yosh, Ball, Maks. ball, Foiz, O'tdi, Holat, Boshlangan, Tugagan, Davomiylik. Max 10 000 rows (`400` "Filtrlarni toraytiring" above). Text cells starting with `= + - @` are neutralised (decision #32) |
+
+List row: `{id, full_name, age, test{id,title}, subject{id,name}, branch{id,name}, status, score,
+max_score, percent, passed, pass_percent, started_at, finished_at, duration_sec}`. The student's
+`access_token` is never returned here.
+
+Telegram notification (not an endpoint): decision #33 and `/docs/TELEGRAM.md`.
+
 ## Planned
 
-- Phase 3: results lists + export. Phase 4: import.
+- Phase 4: import.

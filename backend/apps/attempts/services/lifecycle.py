@@ -10,6 +10,7 @@ from apps.content.scoping import public_tests
 from apps.core.exceptions import BusinessError
 
 from ..models import Attempt, AttemptItem, AttemptStatus
+from ..tasks import enqueue_notification
 from .grading import grade_item, summarize
 from .snapshot import build_snapshots
 
@@ -53,6 +54,7 @@ def finalize(attempt, status, finished_at):
     attempt.status = status
     attempt.finished_at = finished_at
     attempt.save()
+    enqueue_notification(attempt.pk)  # after commit; once per attempt (task is idempotent)
 
 
 def expire_if_due(attempt, now=None):

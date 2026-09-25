@@ -18,9 +18,9 @@ in scope for the current phase and why.
 - **Branch admins create users only inside their own branch.** Teachers only touch
   subjects assigned to them. Never trust a `branch` value from the request body for
   non-superadmins — take it from `request.user`.
-- **Don't build ahead of the roadmap.** Check `/docs/ROADMAP.md`. Current phase: 0, 1a, 1b and 2
-  (anonymous student web flow) done; 3 (results/export) is next. No bot, no celery-beat, no
-  import/export before their phase. Ideas for later go to `/docs/ROADMAP.md` or
+- **Don't build ahead of the roadmap.** Check `/docs/ROADMAP.md`. Current phase: 0, 1a, 1b, 2
+  (anonymous student web flow) and 3 (results, xlsx export, Telegram result notification) done;
+  4 (import) is next. No interactive bot, no celery-beat, no import before their phase. Ideas for later go to `/docs/ROADMAP.md` or
   `/docs/DECISIONS.md`. The staff API returns `is_correct`; the public API (`apps/attempts`, `/api/v1/public/`) never returns `is_correct`/`explanation` while an attempt is in progress.
 - **Sanitize all rich text server-side** (`nh3`, via `content.services.sanitize.render_rich`)
   before storage. Never `dangerouslySetInnerHTML` unsanitized content.
