@@ -1,0 +1,51 @@
+# Example crontab entries for production operations
+#
+# To edit your crontab:
+#   sudo crontab -e
+#
+# To view current crontab:
+#   sudo crontab -l
+#
+# Format: MIN HOUR DAY MONTH WEEKDAY COMMAND
+#
+# Time fields:
+#   MIN:    0-59
+#   HOUR:   0-23 (UTC)
+#   DAY:    1-31
+#   MONTH:  1-12
+#   WEEKDAY: 0-6 (0=Sunday)
+#
+# Examples:
+#   0 2 * * *     = Daily at 02:00 UTC
+#   0 0 * * 0     = Weekly on Sunday at 00:00 UTC
+#   0 */6 * * *   = Every 6 hours
+
+# Daily database backup at 02:00 UTC (adjust to your timezone/preference)
+0 2 * * * cd /path/to/testplatform && ./deploy/backup.sh >> /var/log/testplatform_backup.log 2>&1
+
+# Check disk space daily at 08:00 UTC (optional; helps catch full disks before they cause issues)
+0 8 * * * df -h /var/lib/docker/volumes >> /var/log/testplatform_disk_check.log 2>&1
+
+# Weekly deployment check (pull latest code, verify no uncommitted changes)
+# WARNING: This will auto-deploy! Only enable if you use automated CI/CD.
+# 0 0 * * 0 cd /path/to/testplatform && git fetch origin && git status | grep -q "Your branch is behind" && ./deploy/deploy.sh >> /var/log/testplatform_deploy.log 2>&1
+
+# Daily log rotation (Linux logrotate usually handles this automatically, but explicit is safer)
+# 0 3 * * * logrotate -f /etc/logrotate.d/testplatform
+
+# SSL certificate renewal check (Certbot handles this automatically, but you can verify manually)
+# 0 12 * * * certbot renew --quiet
+
+# Health check ping (optional; send to monitoring service if available)
+# */5 * * * * curl -s http://127.0.0.1:7788/healthz/ > /dev/null || echo "Backend down at $(date)" >> /var/log/testplatform_health.log
+
+###############################################
+# NOTES
+###############################################
+# 1. Replace "/path/to/testplatform" with the actual project directory (e.g. /root/testplatform)
+# 2. Ensure the user running the cron job (usually root for docker operations) has the right permissions
+# 3. Redirect output to a log file (as shown above) for audit trails
+# 4. Use absolute paths in cron commands (cron has a limited PATH environment)
+# 5. Test each cron job manually before adding to crontab
+# 6. Monitor log files: tail -f /var/log/testplatform_backup.log
+# 7. For production email alerts on cron job failures, configure SSMTP or Postfix
