@@ -10,6 +10,9 @@ const ALLOWED_TAGS = [
   "p", "b", "strong", "i", "em", "u", "s", "sub", "sup", "ul", "ol", "li",
   "table", "thead", "tbody", "tr", "th", "td", "code", "pre", "blockquote",
   "br", "img", "span", "h1", "h2", "h3", "h4", "hr",
+  // Only the server's `<div class="math-block">` wrapper (display formulas) uses <div>; every
+  // attribute on any other <div> is stripped by the hook below, like nh3 does server-side.
+  "div",
 ];
 const ALLOWED_ATTR = ["src", "alt", "colspan", "rowspan", "class", "data-tex"];
 const MEDIA_SRC = /^\/media\/[A-Za-z0-9_-]+\/[A-Za-z0-9_.-]+$/;
