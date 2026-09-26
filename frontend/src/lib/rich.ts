@@ -21,6 +21,16 @@ function purifier() {
   if (!DOMPurify.isSupported) return null;
   if (!hooked) {
     hooked = true;
+    // The URI allow-list below would otherwise strip `class`/`data-tex` from our own math
+    // elements (their values are not /media/ paths), leaving empty spans. Keep exactly those
+    // two attributes, and only on span.math-inline / div.math-block; the value is only ever
+    // read as a string by KaTeX, never injected as HTML.
+    DOMPurify.addHook("uponSanitizeAttribute", (node, data) => {
+      const cls = node.getAttribute("class");
+      const isMath =
+        (node.nodeName === "SPAN" && cls === "math-inline") || (node.nodeName === "DIV" && cls === "math-block");
+      if (isMath && (data.attrName === "class" || data.attrName === "data-tex")) data.forceKeepAttr = true;
+    });
     DOMPurify.addHook("afterSanitizeAttributes", (node) => {
       // class/data-tex only survive on our own math elements (see docs/DECISIONS.md #35).
       const cls = node.getAttribute("class");
