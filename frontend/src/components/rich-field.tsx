@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useRef, useState, type ClipboardEvent, type DragEvent } from "react";
 import { renderPreview } from "@/lib/rich";
+import { useMath } from "@/lib/math";
 import type { BodyFormat, MediaAsset } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
@@ -39,6 +40,8 @@ export function RichField({ label, format, value, onChange, upload, error, rows 
   const [over, setOver] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const html = useMemo(() => renderPreview(format, value), [format, value]);
+  const previewRef = useRef<HTMLDivElement>(null);
+  useMath(previewRef);
   const showPreview = compact ? format === "html" || MARKUP.test(value) : true;
 
   async function insertImage(file: File) {
@@ -141,7 +144,7 @@ export function RichField({ label, format, value, onChange, upload, error, rows 
       {showPreview && html && (
         <div className="rounded-lg border border-border-soft bg-subtle/60 px-3 py-2">
           <p className="mb-1 text-xs font-medium uppercase tracking-wide text-faint">Ko&apos;rinishi</p>
-          <div className="rich text-base" dangerouslySetInnerHTML={{ __html: html }} />
+          <div ref={previewRef} className="rich text-base" dangerouslySetInnerHTML={{ __html: html }} />
         </div>
       )}
     </div>

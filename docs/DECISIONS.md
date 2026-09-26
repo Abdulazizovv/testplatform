@@ -219,6 +219,18 @@ superadmin (branch writes already were) and hidden from admin/teacher responses.
 redirect result messages (child names) to an arbitrary chat is a data-leak risk, and it keeps the
 permission matrix unchanged. Revisit if branch admins should manage it themselves.
 
+**#35 - Math formulas (KaTeX).** Question/option/explanation/description text supports `$...$`
+(inline) and `$$...$$` (block) LaTeX, in both `md` and `html` formats. `render_rich` cuts math out
+*before* markdown/nh3 (so `_ * \ { } ^ | < >` are never mangled), sanitizes, then re-inserts
+`<span class="math-inline" data-tex="...">` / `<div class="math-block" data-tex="...">` with
+HTML-escaped TeX. nh3 still allows no `class`/`data-*`, so hand-written look-alike markup is
+stripped. Pandoc-style rules: opening `$` must be followed by non-space, closing `$` preceded by
+non-space and not followed by a digit (so "$5 va $10" stays text); `\$` is a literal dollar;
+inline math never spans a blank line; max 5000 chars per formula. The browser renders it with
+`katex` (self-hosted CSS/fonts, `trust:false`, `throwOnError:false`, `strict:'ignore'`) through
+one shared hook (`lib/math.ts`, used by `RichHtml` and the editor preview); `lib/rich.ts`
+mirrors the extraction and allows `class`/`data-tex` only on those two elements.
+
 ## Future decisions (recorded now, implemented in their phase)
 
 **F1 - Content hierarchy:** Branch -> Subject (belongs to ONE branch) -> Test -> Question ->

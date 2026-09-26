@@ -105,7 +105,7 @@ allowed roles; the sidebar only hides links.
   403 -> `/auth/me/` check -> redirect to `/kirish`, `ApiError` with field errors, multipart upload).
 - `lib/session.ts`: server-side `getCurrentUser`, `requireUser`, `serverGet` (dashboard counts).
 - `lib/rich.ts`: markdown-it (html off) + DOMPurify with the same allow-list as nh3, for
-  previews only; the server re-sanitizes. New dependencies: `markdown-it`, `dompurify`.
+  previews only; the server re-sanitizes. New dependencies: `markdown-it`, `dompurify`, `katex` (math, see DECISIONS #35; `lib/math.ts`).
 - `components/ui/*`: shadcn-style primitives written in-repo (no Radix): Button, Field/Input/
   Select/Textarea, Dialog (native `<dialog>`), Toast, Badge, Pagination, states.
 - List pages are Client Components fetching via `useFetch`; pages themselves are Server

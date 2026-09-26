@@ -13,7 +13,7 @@ Staff panel for the test platform. Read `AGENTS.md` before writing Next code.
 - `src/components/`: panel shell, test form/actions, question editor, rich/image fields;
   `components/ui/`: primitives.
 - `src/lib/`: `api.ts` (fetch wrapper), `session.ts` (server), `types.ts` (mirrors docs/API.md),
-  `rich.ts` (preview sanitizing), `question-rules.ts` (live mirror of publish validation).
+  `rich.ts` (preview sanitizing), `math.ts` (KaTeX rendering of `data-tex` elements), `question-rules.ts` (live mirror of publish validation).
 
 ## Conventions
 Uzbek Latin copy, light + dark theme tokens in `globals.css`, tap targets >= 44px on mobile,

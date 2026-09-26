@@ -304,7 +304,7 @@ export function QuestionEditor({
         error={errors?.body}
         rows={6}
         placeholder={draft.format === "md" ? "Masalan: 2 + 2 nechaga teng?" : "<p>2 + 2 nechaga teng?</p>"}
-        hint="Rasmni matn ichiga qo'yish uchun uni shu yerga tashlang yoki joylashtiring."
+        hint="Formula: $x^2$ yoki blok uchun $$...$$. Rasmni matn ichiga qo'yish uchun uni shu yerga tashlang yoki joylashtiring."
       />
 
       <ImageField label="Savol rasmi (ixtiyoriy)" value={draft.image} onChange={(image) => patch({ image })} upload={upload} error={errors?.image} />

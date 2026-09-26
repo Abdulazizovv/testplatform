@@ -97,3 +97,60 @@ class SanitizeTests(SimpleTestCase):
     def test_media_names_in(self):
         names = media_names_in(f"a ![x]({GOOD_IMG}) b")
         self.assertEqual(names, {"uploads/3f2b6c1e-0000-4000-8000-000000000000.png"})
+
+
+class MathTests(SimpleTestCase):
+    def tex(self, html):
+        import html as h
+
+        return [h.unescape(t) for t in re.findall(r'data-tex="([^"]*)"', html)]
+
+    def test_latex_kept_verbatim(self):
+        for tex in (r"{b}_{1}+{b}_{3}", r"\frac{a}{b}", r"\left| x \right|", r"\int_{0}^{4}", r"\{a\}\\ b*c<d>"):
+            for fmt in ("md", "html"):
+                html = render_rich(fmt, f"Hisoblang: ${tex}$ ni")
+                self.assertEqual(self.tex(html), [tex], html)
+                self.assertIn('<span class="math-inline" data-tex=', html)
+
+    def test_outside_markdown_still_works(self):
+        html = render_rich("md", "**qalin** *yotiq* snake_case_word $a_1*b_2$ **x**")
+        self.assertEqual(html.count("<strong>"), 2)
+        self.assertIn("<em>yotiq</em>", html)
+        self.assertEqual(self.tex(html), ["a_1*b_2"])
+
+    def test_block(self):
+        html = render_rich("md", "Formula:\n\n$$\n" + r"\frac{a}{b}" + "\n$$\n\nOxiri")
+        self.assertIn(r'<div class="math-block" data-tex="\frac{a}{b}"></div>', html)
+        self.assertNotIn("<p><div", html)
+
+    def test_unpaired_and_escaped_dollar(self):
+        for fmt in ("md", "html"):
+            html = render_rich(fmt, "Narxi $5 va $10 bo'ldi")
+            self.assertNotIn("data-tex", html)
+            self.assertIn("$5 va $10", html)
+            html = render_rich(fmt, r"\$x\$ va $y$")
+            self.assertEqual(self.tex(html), ["y"])
+            self.assertIn("$x$", html)
+
+    def test_xss(self):
+        html = render_rich("md", '$"><script>alert(1)</script><img src=x onerror=alert(1)>$')
+        self.assertNotIn("<script", html)
+        self.assertNotIn("<img", html)
+        self.assertEqual(len(re.findall(r"<span", html)), 1)
+        self.assertEqual(self.tex(html), ['"><script>alert(1)</script><img src=x onerror=alert(1)>'])
+        for fmt in ("md", "html"):
+            html = render_rich(
+                fmt, '<span class="math-inline" data-tex="x" onclick="a()">q</span><div class="math-block" data-tex="y">z</div>'
+            )
+            self.assertNotIn("<span class", html)
+            self.assertNotIn("<span data", html)
+            self.assertNotIn("<div", html)
+            self.assertIsNone(re.search(r"<[^>]*onclick", html), html)
+
+    def test_html_mode_and_markers(self):
+        html = render_rich("html", "<p>a $x^2$ b</p><p>$$y$$</p>\ue000" "0\ue001")
+        self.assertEqual(self.tex(html), ["x^2", "y"])
+
+    def test_option_text(self):
+        html = render_rich("md", r"$\sqrt{2}$")
+        self.assertEqual(self.tex(html), [r"\sqrt{2}"])

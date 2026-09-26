@@ -310,6 +310,10 @@ dialog[open]::backdrop {
 .rich table { border-collapse: collapse; display: block; overflow-x: auto; }
 .rich th, .rich td { border: 1px solid var(--border); padding: 0.35em 0.7em; }
 .rich th { background: var(--subtle); font-weight: 700; }
+.rich .math-block { display: block; margin: 0.6em 0; overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+.rich .math-block .katex-display { margin: 0; }
+.rich .katex { font-size: 1.08em; color: inherit; }
+.rich .math-error { font-family: ui-monospace, monospace; color: var(--muted); }
 .rich hr { border: 0; border-top: 1px solid var(--border); margin: 1em 0; }
 
 @media (prefers-reduced-motion: reduce) {
